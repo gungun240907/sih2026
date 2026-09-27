@@ -1,0 +1,46 @@
+CANDIDATE PROFILE
+Location: Bengaluru, Karnataka
+
+CAREER OBJECTIVE
+AI/ML and Full Stack Engineering student with hands-on experience in building end-to-end applications using machine learning models, RESTful APIs, and modern web technologies. Skilled in Python, JavaScript, and data-driven problem solving, with experience in developing scalable systems and integrating AI-based features such as chatbots.
+
+EDUCATION
+- B.E in Artificial Intelligence and Machine Learning, CMR Institute of Technology, Bengaluru | CGPA: 8.91 | 2026 (Pursuing)
+- 2nd PUC Science (PCMC), Sri Chaitanya PU College | 91.5% | 2022
+- 10th CBSE, Sri Chaitanya Techno School | 88% | 2020
+
+TECHNICAL SKILLS
+Programming Languages: Python, JavaScript, Java, C, C++, HTML, SQL
+Databases: MySQL, PostgreSQL
+Tools & Software: Docker, Apache Airflow, Tableau, PowerBI, Jupyter Notebook, Git, GitLab, VS Code
+Frameworks: Django REST Framework, React.js, Node.js, Scikit-learn, Pandas
+
+PROJECTS
+1. Coronary Heart Disease Diagnosis with AI Chatbot (Ongoing)
+   - Full-stack AI web app to predict coronary heart disease using patient health records
+   - ML classification models using Scikit-learn exposed via RESTful APIs
+   - Integrated intelligent chatbot for personalized health insights
+   - Stack: Python, HTML, CSS, Node.js, MongoDB, React.js, Scikit-learn, Pandas
+
+2. Business Process Automation Dashboard
+   - Full-stack business automation platform for financial and operational workflows
+   - Built scalable backend with Django REST Framework and RESTful APIs
+   - Integrated Power BI dashboards for real-time analytics
+   - Stack: Python, Django REST Framework, HTML, CSS, Chart.js, SQLite, Power BI
+
+INTERNSHIP
+Company: Everlytics Data Science India LLP
+Role: Data Engineering Intern | Nov 2025 – March 2026 (6 months)
+- Designed and maintained ETL pipelines using Python and SQL
+- Automated workflows using Apache Airflow for data orchestration
+- Worked with Azure infrastructure, Apache Doris and Apache Iceberg
+- Optimized SQL queries and improved data processing efficiency
+- Used Docker and GitLab for containerization and version control
+Skills: ETL Development, Airflow, SQL Optimization, Azure, Apache Doris, Docker, GitLab
+
+CERTIFICATIONS
+- SQL Using AI Workshop – AI for Techies (June 2025)
+- Machine Learning Foundations – Infosys Springboard (April 2025)
+- Java Basics – Udemy (Dec 2024)
+- Python Programming – Udemy (Aug 2023)
+- Fundamentals of ML and Big Data – CMR Institute of Technology (April 2023)
