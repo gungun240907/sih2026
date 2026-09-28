@@ -1,6 +1,6 @@
 import json
 from openai import OpenAI
-from config import GROQ_API_KEY
+from config import GROQ_API_KEY, GROQ_MODEL
 from tracker.models import Job
 client = OpenAI(
     api_key=GROQ_API_KEY,
@@ -40,7 +40,7 @@ JOB DESCRIPTION:
 def score_job(job: Job, resume_text: str) -> Job:
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=GROQ_MODEL,
             messages=[{
                 "role": "user",
                 "content": SCORE_PROMPT.format(
