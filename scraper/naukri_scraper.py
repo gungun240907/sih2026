@@ -4,6 +4,7 @@ from datetime import datetime
 from playwright.sync_api import sync_playwright
 
 from scraper.base_scraper import BaseScraper
+from config import HEADLESS
 from tracker.models import Job
 
 
@@ -19,7 +20,7 @@ class NaukriScraper(BaseScraper):
         url = self._build_url()
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=HEADLESS)
             page = browser.new_page()
 
             # Set user agent to avoid detection

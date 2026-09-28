@@ -67,18 +67,24 @@ Create a `.env` file in the repo root (gitignored):
 
 ```env
 GROQ_API_KEY=your_groq_api_key
+GROQ_MODEL=openai/gpt-oss-120b
 GMAIL_ADDRESS=you@gmail.com
 RESEND_API_KEY=your_resend_api_key
 GOOGLE_SHEET_NAME=Job Applications
+HEADLESS=true
 ```
+
+`GROQ_MODEL` must be a model your Groq plan actually has access to — check
+`GET https://api.groq.com/openai/v1/models` with your key. `HEADLESS=true`
+(secret, no visible browser) is the default; set `HEADLESS=false` to watch the
+scraper work in a visible Chromium window.
 
 ### 3. Google Sheets
 
 - Create a Google Cloud project and enable the **Sheets API** and **Drive API**
 - Create a **Service Account**, download its JSON key, and rename it
   `credentials.json`, then place it in the repo root (gitignored)
-- Create a Google Sheet — its name must match `GOOGLE_SHEET_NAME`
-  (default `Job Applications`, which `sheets_tracker.py` currently hardcodes)
+- Create a Google Sheet whose name matches `GOOGLE_SHEET_NAME`
 - Share the sheet with the service account's email as **Editor**
 
 ### 4. Resume
@@ -102,8 +108,10 @@ Requires > 2 yrs    →  DISCARD regardless of score
 
 ## Notes
 
-- `scraper/linkedin_scraper.py` and `scraper/naukri_scraper.py` launch Chromium with
-  `headless=False`, so a browser window opens during a run. Set `headless=True` in both
-  files if you want a background run.
+- `main.py` reconfigures stdout/stderr to UTF-8 on startup, so the `→` separators print
+  correctly in the default Windows console. If characters still look garbled, run
+  `chcp 65001` first.
 - The `test_*.py` files are standalone smoke tests for each stage, run individually with
   `python test_scraper.py`, `python test_matcher.py`, etc.
+- Naukri's markup is unstable and it rate-limits anonymous scraping, so `naukri_scraper`
+  can intermittently return zero jobs. LinkedIn is the more reliable of the two.

@@ -3,6 +3,7 @@ import random
 from datetime import datetime
 from playwright.sync_api import sync_playwright
 from scraper.base_scraper import BaseScraper
+from config import HEADLESS
 from tracker.models import Job
 
 class LinkedInScraper(BaseScraper):
@@ -14,7 +15,7 @@ class LinkedInScraper(BaseScraper):
         url = f"{self.BASE_URL}?keywords={keyword_query}&location={self.location}"
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=HEADLESS)
             page = browser.new_page()
             page.goto(url, timeout=60000)
             page.wait_for_timeout(3000)

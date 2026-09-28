@@ -11,3 +11,4 @@ KEYWORDS           = ["AI Engineer", "Machine Learning Engineer"]
 LOCATION           = "Bengaluru"
 MATCH_THRESHOLD    = 0.65
 AUTO_APPLY_THRESHOLD = 0.85
+HEADLESS           = os.getenv("HEADLESS", "true").strip().lower() in ("1", "true", "yes", "on")

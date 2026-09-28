@@ -1,5 +1,6 @@
 import gspread
 from google.oauth2.service_account import Credentials
+from config import GOOGLE_SHEET_NAME
 from tracker.models import Job
 
 SCOPES = [
@@ -16,7 +17,7 @@ HEADERS = [
 def get_sheet():
     creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
     gc = gspread.authorize(creds)
-    return gc.open("Job Applications").sheet1
+    return gc.open(GOOGLE_SHEET_NAME).sheet1
 
 
 def setup_headers():

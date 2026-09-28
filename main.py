@@ -1,4 +1,10 @@
+import sys
 import time
+
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 from scraper.linkedin_scraper import LinkedInScraper
 from scraper.naukri_scraper import NaukriScraper
 from matcher.resume_matcher import score_job, filter_jobs
