@@ -7,6 +7,7 @@ import Header from './components/Header'
 import JobTable from './components/JobTable'
 import LiveScraping from './components/LiveScraping'
 import MetricsRow from './components/MetricsRow'
+import ResumePanel from './components/ResumePanel'
 import RunControls from './components/RunControls'
 import { RecommendationBars, ScoreChart } from './components/Charts'
 import { useJobs } from './hooks/useJobs'
@@ -23,6 +24,7 @@ export default function App() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [view, setView] = useState<View>(initialView)
   const [location, setLocation] = useState(DEFAULT_CITY)
+  const [activeResumeId, setActiveResumeId] = useState<string | null>(null)
 
   useEffect(() => {
     api.getStats().then(setStats).catch(() => setStats(null))
@@ -46,7 +48,7 @@ export default function App() {
 
   const handleRun = async () => {
     try {
-      await pipeline.run({ location })
+      await pipeline.run({ location, resume_id: activeResumeId })
       // full new page for live scraping (LinkedIn phase, then Naukri phase)
       goLive(true)
       setView('live')
@@ -102,6 +104,11 @@ export default function App() {
           </button>
         )}
         <MetricsRow stats={stats} />
+        <ResumePanel
+          activeResumeId={activeResumeId}
+          onActiveChange={setActiveResumeId}
+          onSuggestLocation={setLocation}
+        />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <ScoreChart stats={stats} />
           <RecommendationBars stats={stats} />

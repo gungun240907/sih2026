@@ -35,74 +35,80 @@ class NaukriScraper(BaseScraper):
 
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=show, args=args, slow_mo=250 if not show else 0)
-            page = browser.new_page()
-
-            # Set user agent to avoid detection
-            page.set_extra_http_headers({
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                              "AppleWebKit/537.36 (KHTML, like Gecko) "
-                              "Chrome/120.0.0.0 Safari/537.36"
-            })
-
-            emit(f"Naukri: opening {url}")
-            page.goto(url, timeout=60000)
-            page.wait_for_timeout(3000)
-
-            # Dismiss any popups
             try:
-                close = page.query_selector("button.close-btn")
-                if close:
-                    close.click()
-                    page.wait_for_timeout(500)
-            except Exception:
-                pass
+                page = browser.new_page()
 
-            cards = page.query_selector_all(".srp-jobtuple-wrapper")
-            emit(f"Naukri: found {len(cards)} job cards")
+                # Set user agent to avoid detection
+                page.set_extra_http_headers({
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                  "Chrome/120.0.0.0 Safari/537.36"
+                })
 
-            for card in cards[:max_jobs]:
+                emit(f"Naukri: opening {url}")
+                page.goto(url, timeout=60000)
+                page.wait_for_timeout(3000)
+
+                # Dismiss any popups
                 try:
-                    title_el   = card.query_selector(".title")
-                    company_el = card.query_selector(".comp-name")
-                    location_el = card.query_selector(".locWdth")
-                    link_el    = card.query_selector("a.title")
+                    close = page.query_selector("button.close-btn")
+                    if close:
+                        close.click()
+                        page.wait_for_timeout(500)
+                except Exception:
+                    pass
 
-                    if not (title_el and company_el and link_el):
+                cards = page.query_selector_all(".srp-jobtuple-wrapper")
+                emit(f"Naukri: found {len(cards)} job cards")
+
+                for card in cards[:max_jobs]:
+                    try:
+                        title_el   = card.query_selector(".title")
+                        company_el = card.query_selector(".comp-name")
+                        location_el = card.query_selector(".locWdth")
+                        link_el    = card.query_selector("a.title")
+
+                        if not (title_el and company_el and link_el):
+                            continue
+
+                        title    = title_el.inner_text().strip()
+                        company  = company_el.inner_text().strip()
+                        location = location_el.inner_text().strip() if location_el else self.location
+                        link     = link_el.get_attribute("href")
+
+                        if not link:
+                            continue
+
+                        job = Job(
+                            title=title,
+                            company=company,
+                            location=location,
+                            url=link,
+                            description="",
+                            source="naukri",
+                            scraped_at=datetime.now().isoformat(),
+                        )
+                        jobs.append(job)
+                        emit(f"Naukri: {title} @ {company}", job)
+                        time.sleep(random.uniform(0.3, 0.8))
+
+                    except Exception as e:
+                        emit(f"Naukri: skipped card ({e})")
                         continue
 
-                    title    = title_el.inner_text().strip()
-                    company  = company_el.inner_text().strip()
-                    location = location_el.inner_text().strip() if location_el else self.location
-                    link     = link_el.get_attribute("href")
+                # Fetch descriptions
+                for job in jobs:
+                    job.description = self._get_description(page, job.url)
+                    emit(f"Naukri: description ({len(job.description)} chars) for {job.title}", job)
+                    time.sleep(random.uniform(1, 2))
 
-                    if not link:
-                        continue
-
-                    job = Job(
-                        title=title,
-                        company=company,
-                        location=location,
-                        url=link,
-                        description="",
-                        source="naukri",
-                        scraped_at=datetime.now().isoformat(),
-                    )
-                    jobs.append(job)
-                    emit(f"Naukri: {title} @ {company}", job)
-                    time.sleep(random.uniform(0.3, 0.8))
-
-                except Exception as e:
-                    emit(f"Naukri: skipped card ({e})")
-                    continue
-
-            # Fetch descriptions
-            for job in jobs:
-                job.description = self._get_description(page, job.url)
-                emit(f"Naukri: description ({len(job.description)} chars) for {job.title}", job)
-                time.sleep(random.uniform(1, 2))
-
-            browser.close()
-            emit(f"Naukri: done, {len(jobs)} jobs")
+                emit(f"Naukri: done, {len(jobs)} jobs")
+            finally:
+                # always close — otherwise the headed Chrome window stays on the desktop
+                try:
+                    browser.close()
+                except Exception:
+                    pass
 
         return self._dedupe(jobs)
 

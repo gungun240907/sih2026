@@ -70,6 +70,34 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json()
 }
 
+export interface Resume {
+  text: string
+  char_count: number
+  source: string
+}
+
+export interface ResumeUpload {
+  resume_id: string
+  filename: string
+  char_count: number
+  text_preview: string
+  warning: string | null
+}
+
+export interface ResumeAnalysis {
+  resume_id: string | null
+  skills: string[]
+  roles: string[]
+  years_experience: number
+  suggested_keywords: string[]
+  suggested_location: string
+  ats_score: number
+  strengths: string[]
+  gaps: string[]
+  summary: string
+  fallback_used: boolean
+}
+
 export const api = {
   getJobs: (filters?: Partial<JobFilters> & { sort?: string }) => {
     const params = new URLSearchParams()
@@ -90,4 +118,31 @@ export const api = {
       body: JSON.stringify(params ?? {}),
     }),
   getRunStatus: () => request<RunStatus>('/api/pipeline/status'),
+  getResume: () => request<Resume>('/api/resume'),
+  updateResume: (text: string) =>
+    request<Resume>('/api/resume', { method: 'PUT', body: JSON.stringify({ text }) }),
+  uploadResume: async (file: File): Promise<ResumeUpload> => {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await fetch('/api/resume/upload', { method: 'POST', body: form })
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({ detail: res.statusText }))
+      throw new Error(body.detail ?? `Upload failed: ${res.status}`)
+    }
+    return res.json()
+  },
+  analyzeResume: (body: { resume_id?: string; text?: string }) =>
+    request<ResumeAnalysis>('/api/resume/analyze', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  getActiveResume: () =>
+    request<{ resume_id: string | null; source: string; char_count: number }>('/api/resume/active'),
+  setActiveResume: (resume_id: string) =>
+    request<{ resume_id: string }>('/api/resume/active', {
+      method: 'POST',
+      body: JSON.stringify({ resume_id }),
+    }),
+  exportResumeUrl: (format: 'md' | 'txt' | 'pdf', resume_id?: string) =>
+    `/api/resume/export?format=${format}${resume_id ? `&resume_id=${resume_id}` : ''}`,
 }

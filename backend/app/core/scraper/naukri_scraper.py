@@ -36,94 +36,99 @@ class NaukriScraper(BaseScraper):
 
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=show, channel="chrome", args=args, slow_mo=250 if not show else 0)
-            page = browser.new_page()
-
-            # Set user agent to avoid detection
-            page.set_extra_http_headers({
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                              "AppleWebKit/537.36 (KHTML, like Gecko) "
-                              "Chrome/120.0.0.0 Safari/537.36"
-            })
-
-            emit(f"Naukri: opening {url}")
-            response = page.goto(url, timeout=60000)
-            page.wait_for_timeout(3000)
-
-            # Naukri sits behind Akamai, which answers 403 "Access Denied" to
-            # headless sessions before any HTML is served. Detect that explicitly,
-            # otherwise a blocked run is indistinguishable from "no jobs today".
-            status = response.status if response else None
-            title = (page.title() or "").lower()
-            if status == 403 or "access denied" in title or "forbidden" in title:
-                print(
-                    "Naukri: BLOCKED (HTTP %s, title=%r). Their CDN rejects this "
-                    "client before HTML loads - returning 0 jobs. LinkedIn results "
-                    "are unaffected." % (status, page.title())
-                )
-                browser.close()
-                return []
-
-            # Dismiss any popups
             try:
-                close = page.query_selector("button.close-btn")
-                if close and close.is_visible():
-                    close.click()
-                    page.wait_for_timeout(500)
-            except Exception:
-                pass
+                page = browser.new_page()
 
-            cards = page.query_selector_all(".srp-jobtuple-wrapper")
-            emit(f"Naukri: found {len(cards)} job cards")
-            if not cards:
-                print(
-                    "Naukri: 0 cards despite a %s response - the CSS selectors "
-                    "(.srp-jobtuple-wrapper) are likely stale and need updating."
-                    % status
-                )
+                # Set user agent to avoid detection
+                page.set_extra_http_headers({
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                  "Chrome/120.0.0.0 Safari/537.36"
+                })
 
-            for card in cards[:max_jobs]:
-                try:
-                    title_el   = card.query_selector(".title")
-                    company_el = card.query_selector(".comp-name")
-                    location_el = card.query_selector(".locWdth")
-                    link_el    = card.query_selector("a.title")
+                emit(f"Naukri: opening {url}")
+                response = page.goto(url, timeout=60000)
+                page.wait_for_timeout(3000)
 
-                    if not (title_el and company_el and link_el):
-                        continue
-
-                    title    = title_el.inner_text().strip()
-                    company  = company_el.inner_text().strip()
-                    location = location_el.inner_text().strip() if location_el else self.location
-                    link     = link_el.get_attribute("href")
-
-                    if not link:
-                        continue
-
-                    job = Job(
-                        title=title,
-                        company=company,
-                        location=location,
-                        url=link,
-                        description="",
-                        source="naukri",
-                        scraped_at=datetime.now().isoformat(),
+                # Naukri sits behind Akamai, which answers 403 "Access Denied" to
+                # headless sessions before any HTML is served. Detect that explicitly,
+                # otherwise a blocked run is indistinguishable from "no jobs today".
+                status = response.status if response else None
+                title = (page.title() or "").lower()
+                if status == 403 or "access denied" in title or "forbidden" in title:
+                    print(
+                        "Naukri: BLOCKED (HTTP %s, title=%r). Their CDN rejects this "
+                        "client before HTML loads - returning 0 jobs. LinkedIn results "
+                        "are unaffected." % (status, page.title())
                     )
-                    jobs.append(job)
-                    emit(f"Naukri: {title} @ {company}", job)
-                    time.sleep(random.uniform(0.3, 0.8))
+                    return []
 
-                except Exception as e:
-                    emit(f"Naukri: skipped card ({e})")
-                    continue
+                # Dismiss any popups
+                try:
+                    close = page.query_selector("button.close-btn")
+                    if close and close.is_visible():
+                        close.click()
+                        page.wait_for_timeout(500)
+                except Exception:
+                    pass
 
-            # Fetch descriptions
-            for job in jobs:
-                job.description = self._get_description(page, job.url)
-                emit(f"Naukri: description ({len(job.description)} chars) for {job.title}", job)
-                time.sleep(random.uniform(1, 2))
+                cards = page.query_selector_all(".srp-jobtuple-wrapper")
+                emit(f"Naukri: found {len(cards)} job cards")
+                if not cards:
+                    print(
+                        "Naukri: 0 cards despite a %s response - the CSS selectors "
+                        "(.srp-jobtuple-wrapper) are likely stale and need updating."
+                        % status
+                    )
 
-            browser.close()
-            emit(f"Naukri: done, {len(jobs)} jobs")
+                for card in cards[:max_jobs]:
+                    try:
+                        title_el   = card.query_selector(".title")
+                        company_el = card.query_selector(".comp-name")
+                        location_el = card.query_selector(".locWdth")
+                        link_el    = card.query_selector("a.title")
+
+                        if not (title_el and company_el and link_el):
+                            continue
+
+                        title    = title_el.inner_text().strip()
+                        company  = company_el.inner_text().strip()
+                        location = location_el.inner_text().strip() if location_el else self.location
+                        link     = link_el.get_attribute("href")
+
+                        if not link:
+                            continue
+
+                        job = Job(
+                            title=title,
+                            company=company,
+                            location=location,
+                            url=link,
+                            description="",
+                            source="naukri",
+                            scraped_at=datetime.now().isoformat(),
+                        )
+                        jobs.append(job)
+                        emit(f"Naukri: {title} @ {company}", job)
+                        time.sleep(random.uniform(0.3, 0.8))
+
+                    except Exception as e:
+                        emit(f"Naukri: skipped card ({e})")
+                        continue
+
+                # Fetch descriptions
+                for job in jobs:
+                    job.description = self._get_description(page, job.url)
+                    emit(f"Naukri: description ({len(job.description)} chars) for {job.title}", job)
+                    time.sleep(random.uniform(1, 2))
+
+                emit(f"Naukri: done, {len(jobs)} jobs")
+            finally:
+                # always close — otherwise the headed Chrome window stays on the desktop
+                try:
+                    browser.close()
+                except Exception:
+                    pass
 
         return self._dedupe(jobs)
 

@@ -31,50 +31,56 @@ class LinkedInScraper(BaseScraper):
 
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=show, args=args, slow_mo=250 if not show else 0)
-            page = browser.new_page()
-            emit(f"LinkedIn: opening {url}")
-            page.goto(url, timeout=60000)
-            page.wait_for_timeout(3000)
+            try:
+                page = browser.new_page()
+                emit(f"LinkedIn: opening {url}")
+                page.goto(url, timeout=60000)
+                page.wait_for_timeout(3000)
 
-            cards = page.query_selector_all(".base-card")
-            emit(f"LinkedIn: found {len(cards)} job cards")
+                cards = page.query_selector_all(".base-card")
+                emit(f"LinkedIn: found {len(cards)} job cards")
 
-            for card in cards[:max_jobs]:
-                try:
-                    title_el = card.query_selector(".base-search-card__title")
-                    company_el = card.query_selector(".base-search-card__subtitle")
-                    location_el = card.query_selector(".job-search-card__location")
-                    link_el = card.query_selector("a.base-card__full-link")
+                for card in cards[:max_jobs]:
+                    try:
+                        title_el = card.query_selector(".base-search-card__title")
+                        company_el = card.query_selector(".base-search-card__subtitle")
+                        location_el = card.query_selector(".job-search-card__location")
+                        link_el = card.query_selector("a.base-card__full-link")
 
-                    if not (title_el and company_el and link_el):
+                        if not (title_el and company_el and link_el):
+                            continue
+
+                        title = title_el.inner_text().strip()
+                        company = company_el.inner_text().strip()
+                        location = location_el.inner_text().strip() if location_el else ""
+                        link = link_el.get_attribute("href").split("?")[0]
+
+                        job = Job(
+                            title=title,
+                            company=company,
+                            location=location,
+                            url=link,
+                            description="",
+                            source="linkedin",
+                            scraped_at=datetime.now().isoformat(),
+                        )
+                        jobs.append(job)
+                        emit(f"LinkedIn: {title} @ {company}", job)
+                        time.sleep(random.uniform(0.5, 1.5))
+                    except Exception as e:
+                        emit(f"LinkedIn: skipped a card ({e})")
                         continue
-
-                    title = title_el.inner_text().strip()
-                    company = company_el.inner_text().strip()
-                    location = location_el.inner_text().strip() if location_el else ""
-                    link = link_el.get_attribute("href").split("?")[0]
-
-                    job = Job(
-                        title=title,
-                        company=company,
-                        location=location,
-                        url=link,
-                        description="",
-                        source="linkedin",
-                        scraped_at=datetime.now().isoformat(),
-                    )
-                    jobs.append(job)
-                    emit(f"LinkedIn: {title} @ {company}", job)
-                    time.sleep(random.uniform(0.5, 1.5))
-                except Exception as e:
-                    emit(f"LinkedIn: skipped a card ({e})")
-                    continue
-            for job in jobs:
-                job.description = self.get_description(page, job.url)
-                emit(f"LinkedIn: description ({len(job.description)} chars) for {job.title}", job)
-                time.sleep(random.uniform(1, 2))
-            browser.close()
-            emit(f"LinkedIn: done, {len(jobs)} jobs")
+                for job in jobs:
+                    job.description = self.get_description(page, job.url)
+                    emit(f"LinkedIn: description ({len(job.description)} chars) for {job.title}", job)
+                    time.sleep(random.uniform(1, 2))
+                emit(f"LinkedIn: done, {len(jobs)} jobs")
+            finally:
+                # always close — otherwise the headed Chrome window stays on the desktop
+                try:
+                    browser.close()
+                except Exception:
+                    pass
 
         return self._dedupe(jobs)
 

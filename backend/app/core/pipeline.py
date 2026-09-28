@@ -39,6 +39,8 @@ def run_pipeline(
     match_threshold: float = DEFAULT_MATCH_THRESHOLD,
     auto_apply_threshold: float = DEFAULT_AUTO_APPLY_THRESHOLD,
     max_jobs_per_portal: int = DEFAULT_MAX_JOBS_PER_PORTAL,
+    resume_id: str | None = None,
+    resume_text: str | None = None,
 ) -> dict[str, Any]:
     """Run the full agent pipeline and return a summary dict.
 
@@ -58,7 +60,9 @@ def run_pipeline(
     keywords = keywords or DEFAULT_KEYWORDS
     location = location or DEFAULT_LOCATION
 
-    resume_text = load_resume()
+    from app.core.resume import store as resume_store
+
+    resume_text, resume_source = resume_store.resolve_text(resume_id, resume_text)
     all_jobs: list[Job] = []
 
     # Step 1: Scrape all portals (LinkedIn left Chrome window, Naukri right)
@@ -140,6 +144,7 @@ def run_pipeline(
         "total_logged": len(good_jobs),
         "notified": len(high_score_jobs),
         "location": location,
+        "resume_source": resume_source,
         "jobs": [
             {
                 "id": j.id,

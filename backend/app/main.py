@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import CORS_ORIGINS
-from app.routers import jobs, pipeline, sheet, stats
+from app.routers import jobs, pipeline, resume, sheet, stats
 
 app = FastAPI(
     title="Job Application Agent API",
@@ -24,6 +24,7 @@ app.add_middleware(
 
 app.include_router(jobs.router)
 app.include_router(pipeline.router)
+app.include_router(resume.router)
 app.include_router(sheet.router)
 app.include_router(stats.router)
 

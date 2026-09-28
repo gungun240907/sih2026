@@ -19,6 +19,8 @@ _run.log
 _run.err
 jobs.json
 backend/jobs.json
+backend/uploads/
+backend/resume.bak-*
 
 # Sheet exports
 job_applications.csv

@@ -21,6 +21,8 @@ def start_run(req: schemas.PipelineRunRequest):
         "match_threshold": req.match_threshold if req.match_threshold is not None else DEFAULT_MATCH_THRESHOLD,
         "auto_apply_threshold": req.auto_apply_threshold if req.auto_apply_threshold is not None else DEFAULT_AUTO_APPLY_THRESHOLD,
         "max_jobs_per_portal": req.max_jobs_per_portal or DEFAULT_MAX_JOBS_PER_PORTAL,
+        "resume_id": req.resume_id,
+        "resume_text": req.resume_text,
     }
     try:
         return run_manager.start(params)

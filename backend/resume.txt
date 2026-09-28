@@ -1,46 +1,60 @@
-CANDIDATE PROFILE
-Location: Bengaluru, Karnataka
-
-CAREER OBJECTIVE
-AI/ML and Full Stack Engineering student with hands-on experience in building end-to-end applications using machine learning models, RESTful APIs, and modern web technologies. Skilled in Python, JavaScript, and data-driven problem solving, with experience in developing scalable systems and integrating AI-based features such as chatbots.
-
-EDUCATION
-- B.E in Artificial Intelligence and Machine Learning, CMR Institute of Technology, Bengaluru | CGPA: 8.91 | 2026 (Pursuing)
-- 2nd PUC Science (PCMC), Sri Chaitanya PU College | 91.5% | 2022
-- 10th CBSE, Sri Chaitanya Techno School | 88% | 2020
-
-TECHNICAL SKILLS
-Programming Languages: Python, JavaScript, Java, C, C++, HTML, SQL
-Databases: MySQL, PostgreSQL
-Tools & Software: Docker, Apache Airflow, Tableau, PowerBI, Jupyter Notebook, Git, GitLab, VS Code
-Frameworks: Django REST Framework, React.js, Node.js, Scikit-learn, Pandas
-
-PROJECTS
-1. Coronary Heart Disease Diagnosis with AI Chatbot (Ongoing)
-   - Full-stack AI web app to predict coronary heart disease using patient health records
-   - ML classification models using Scikit-learn exposed via RESTful APIs
-   - Integrated intelligent chatbot for personalized health insights
-   - Stack: Python, HTML, CSS, Node.js, MongoDB, React.js, Scikit-learn, Pandas
-
-2. Business Process Automation Dashboard
-   - Full-stack business automation platform for financial and operational workflows
-   - Built scalable backend with Django REST Framework and RESTful APIs
-   - Integrated Power BI dashboards for real-time analytics
-   - Stack: Python, Django REST Framework, HTML, CSS, Chart.js, SQLite, Power BI
-
-INTERNSHIP
-Company: Everlytics Data Science India LLP
-Role: Data Engineering Intern | Nov 2025 – March 2026 (6 months)
-- Designed and maintained ETL pipelines using Python and SQL
-- Automated workflows using Apache Airflow for data orchestration
-- Worked with Azure infrastructure, Apache Doris and Apache Iceberg
-- Optimized SQL queries and improved data processing efficiency
-- Used Docker and GitLab for containerization and version control
-Skills: ETL Development, Airflow, SQL Optimization, Azure, Apache Doris, Docker, GitLab
-
-CERTIFICATIONS
-- SQL Using AI Workshop – AI for Techies (June 2025)
-- Machine Learning Foundations – Infosys Springboard (April 2025)
-- Java Basics – Udemy (Dec 2024)
-- Python Programming – Udemy (Aug 2023)
-- Fundamentals of ML and Big Data – CMR Institute of Technology (April 2023)
+H J K J L
+H T M L  –  A b l e  t o  c r e a t e  s t r u c t u r e d ,
+s e m a n t i c ,  a n d  r e s p o n s i v e  w e b  p a g e s  . .
+J a v a S c r i p t  –  C a p a b l e  o f  b u i l d i n g
+i n t e r a c t i v e  w e b  f e a t u r e s ,  a n d
+i m p l e m e n t i n g  b a s i c  l o g i c  f o r  d y n a m i c
+a p p l i c a t i o n s .
+C S S  –  S k i l l e d  i n  d e s i g n i n g  r e s p o n s i v e
+a n d  v i s u a l l y  a p p e a l i n g  l a y o u t s .
+P y t h o n  –  P r o f i c i e n t  i n  w r i t i n g  c l e a n
+a n d  e f f i c i e n t  c o d e ,  w i t h  e x p e r i e n c e  i n
+p r o b l e m - s o l v i n g  a n d  b a c k e n d
+d e v e l o p m e n t .
+A n g u l a r  –  F a m i l i a r  w i t h  b u i l d i n g
+d y n a m i c  f r o n t - e n d  a p p l i c a t i o n s  u s i n g
+c o m p o n e n t - b a s e d  a r c h i t e c t u r e .
+M y S Q L  –  A b l e  t o  d e s i g n  a n d  m a n a g e
+d a t a b a s e s ,  w r i t e  q u e r i e s ,  a n d  h a n d l e
+d a t a  e f f i c i e n t l y .
+D j a n g o  –  E x p e r i e n c e d  i n  d e v e l o p i n g
+b a c k e n d  a p p l i c a t i o n s  a n d  i n t e g r a t i n g
+f r o n t e n d  w i t h  d a t a b a s e s  f o r  f u l l - s t a c k
+p r o j e c t s .
+S K I L L S
+P R O F E S S I O N A L  S U M M A R Y
+G U N G U N  C H H A T R I
+C o m p u t e r  S c i e n c e  E n g i n e e r i n g  s t u d e n t  w i t h
+h a n d s - o n  e x p e r i e n c e  i n  P y t h o n ,  H T M L ,  C S S ,  a n d
+D j a n g o ,  c u r r e n t l y  b u i l d i n g  r e a l - w o r l d  p r o j e c t s  .
+S t r o n g  f o u n d a t i o n  i n  f r o n t e n d  a n d  b a c k e n d
+d e v e l o p m e n t ,  w i t h  a  f o c u s  o n  w r i t i n g  c l e a n ,
+e f f i c i e n t  c o d e  a n d  b u i l d i n g  s c a l a b l e  a p p l i c a t i o n s .
+Q u i c k  l e a r n e r  w i t h  a  p r o b l e m - s o l v i n g  m i n d s e t ,
+e a g e r  t o  c o n t r i b u t e  t o  f u l l - s t a c k  d e v e l o p m e n t  a n d
+g r o w  i n  a  h i g h - p e r f o r m a n c e  e n v i r o n m e n t .  S e e k i n g
+a n  i n t e r n s h i p  t o  a p p l y  t e c h n i c a l  s k i l l s ,  g a i n
+i n d u s t r y  e x p o s u r e ,  a n d  d e l i v e r  i m p a c t f u l  s o l u t i o n s .  
+P E R S O N A L  I N F O
+P h o n e :  9 0 4 0 0 3 0 3 3 6  
+E m a i l :  g u n g u n c h h a t r i . o f f i c i a l @ g m a i l . c o m  
+A d d r e s s :  E D U C A T I O N  C O L O N Y , N E A R
+P A N C H M U K H I  H A N U M A N
+M A N D I R , O D I S H A ,  M A L K A N G I R I ,  7 6 4 0 4 5
+( I N )
+C E R T I F I C A T I O N S  &  A C H I E V E M E N T S
+A c h i e v e d  1 s t  P l a c e  a t  I U R  H a c k a t h o n  2 0 2 5 ,
+s h o w c a s i n g  i n n o v a t i o n ,  t e a m w o r k ,  a n d
+t e c h n i c a l  e x e c u t i o n  u n d e r  t i m e  c o n s t r a i n t s .
+ R e p r e s e n t e d  a s  a  p a r t i c i p a n t  i n  a  N a t i o n a l -
+L e v e l  H a c k a t h o n  a t  K a l i n g a  U n i v e r s i t y ;  e a r n e d
+a  p a r t i c i p a t i o n  c e r t i f i c a t e  a n d  h a n d s - o n
+e x p o s u r e  t o  r e a l - w o r l d  p r o b l e m - s o l v i n g .  
+E a r n e d  a  M a c h i n e  L e a r n i n g  C e r t i f i c a t i o n  ,
+c o v e r i n g  c o r e  c o n c e p t s  s u c h  a s  s u p e r v i s e d
+l e a r n i n g ,  m o d e l  e v a l u a t i o n ,  a n d  d a t a
+p r e p r o c e s s i n g  a l s o  c o m p l e t e d  a s s i g n e d
+p r o j e c t s .
+E D U C A T I O N
+T H E  I C F A I  U N I V E R S I T Y ,  R A I P U R ,  C H H A T I S G A R H
+B . t e c h  C S E  2 0 2 4 - 2 0 2 8
