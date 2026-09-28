@@ -12,12 +12,26 @@ from notifier.email_notifier import send_daily_digest
 from tracker.sheets_tracker import (
     log_jobs, get_sheet_url, export_csv, export_xlsx,
 )
-from config import KEYWORDS, LOCATION, MATCH_THRESHOLD, AUTO_APPLY_THRESHOLD, HEADLESS
+from config import KEYWORDS, LOCATION, MATCH_THRESHOLD, AUTO_APPLY_THRESHOLD, HEADLESS, normalize_city
 
 EXPORT = "--export" in sys.argv
 VISIBLE = "--visible" in sys.argv or "--show" in sys.argv
 # --visible forces headed browsers; each portal gets its own window.
 SCRAPE_HEADLESS = False if VISIBLE else HEADLESS
+
+
+def parse_location() -> str:
+    if "--location" in sys.argv:
+        i = sys.argv.index("--location")
+        if i + 1 >= len(sys.argv):
+            print('Usage: python main.py [--location "Mumbai"] [--export] [--visible]')
+            sys.exit(2)
+        try:
+            return normalize_city(sys.argv[i + 1])
+        except ValueError as e:
+            print(f"Error: {e}")
+            sys.exit(2)
+    return LOCATION
 
 def load_resume() -> str:
     with open("resume.txt", "r", encoding="utf-8") as f:
@@ -29,6 +43,8 @@ def run_pipeline():
     print("=" * 50)
 
     resume_text = load_resume()
+    location = parse_location()
+    print(f"Search location: {location}")
     all_jobs = []
 
     # Step 1: Scrape all portals
@@ -41,27 +57,31 @@ def run_pipeline():
         print("  → LinkedIn (left window) + Naukri (right window) in parallel")
         with ThreadPoolExecutor(max_workers=2) as pool:
             fut_link = pool.submit(
-                LinkedInScraper(keywords=KEYWORDS, location=LOCATION).scrape,
+                LinkedInScraper(keywords=KEYWORDS, location=location).scrape,
                 10, False, "left",
             )
             fut_nauk = pool.submit(
-                NaukriScraper(keywords=KEYWORDS, location=LOCATION).scrape,
+                NaukriScraper(keywords=KEYWORDS, location=location).scrape,
                 10, False, "right",
             )
             linkedin_jobs = fut_link.result()
             naukri_jobs = fut_nauk.result()
     else:
         print("  → LinkedIn")
-        linkedin = LinkedInScraper(keywords=KEYWORDS, location=LOCATION)
+        linkedin = LinkedInScraper(keywords=KEYWORDS, location=location)
         linkedin_jobs = linkedin.scrape(max_jobs=10)
         print("  → Naukri")
-        naukri = NaukriScraper(keywords=KEYWORDS, location=LOCATION)
+        naukri = NaukriScraper(keywords=KEYWORDS, location=location)
         naukri_jobs = naukri.scrape(max_jobs=10)
     print(f"     Found {len(linkedin_jobs)} LinkedIn jobs")
     print(f"     Found {len(naukri_jobs)} Naukri jobs")
     all_jobs.extend(linkedin_jobs)
 
     print(f"\n  Total scraped: {len(all_jobs)} jobs across 2 portals")
+
+    if not all_jobs:
+        print(f"\n  No jobs available right now in {location}.")
+        return
 
     # Step 2: Score
     print(f"\n[2/4] Scoring {len(all_jobs)} jobs against your resume...")

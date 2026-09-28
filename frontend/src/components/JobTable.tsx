@@ -23,11 +23,12 @@ interface Props {
   filters: JobFilters
   onFiltersChange: (f: JobFilters) => void
   onStatusUpdate: (jobId: string, status: JobStatus) => Promise<void>
+  location: string
 }
 
 const REC_VALUES: Recommendation[] = ['apply', 'maybe', 'skip']
 
-export default function JobTable({ jobs, loading, error, filters, onFiltersChange, onStatusUpdate }: Props) {
+export default function JobTable({ jobs, loading, error, filters, onFiltersChange, onStatusUpdate, location }: Props) {
   const [sortDesc, setSortDesc] = useState(true)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
 
@@ -76,7 +77,7 @@ export default function JobTable({ jobs, loading, error, filters, onFiltersChang
   if (jobs.length === 0) {
     return (
       <div className="rounded-[10px] border border-border bg-card p-10 text-center text-muted">
-        No jobs logged yet. Click <strong className="text-accent">Run Agent Now</strong> in the sidebar.
+        No jobs logged yet for {location}. Click <strong className="text-accent">Run Agent Now</strong> in the sidebar.
       </div>
     )
   }

@@ -1,6 +1,7 @@
 import time
 import random
 from datetime import datetime
+from urllib.parse import quote
 from playwright.sync_api import sync_playwright
 from app.config import HEADLESS
 from app.core.scraper.base_scraper import BaseScraper
@@ -12,7 +13,7 @@ class LinkedInScraper(BaseScraper):
     def scrape(self, max_jobs: int = 15, headless: bool | None = None, position: str | None = None, on_event=None) -> list[Job]:
         jobs = []
         keyword_query = "%20".join(self.keywords)
-        url = f"{self.BASE_URL}?keywords={keyword_query}&location={self.location}"
+        url = f"{self.BASE_URL}?keywords={keyword_query}&location={quote(self.location)}"
         show = HEADLESS if headless is None else headless
         args = []
         if not show and position == "left":

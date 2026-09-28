@@ -111,9 +111,13 @@ export default function LiveScraping({ status, connected, onBack }: Props) {
 
         {status.state === 'completed' && (
           <div className="rounded-[10px] border border-green/30 bg-green/10 p-4 text-sm font-medium text-green">
-            Scraping complete — {status.counters.found_linkedin ?? 0} LinkedIn +{' '}
-            {status.counters.found_naukri ?? 0} Naukri jobs. Scoring and Sheets logging continue
-            in the background; results appear on the dashboard.
+            {(status.counters.found_linkedin ?? 0) + (status.counters.found_naukri ?? 0) === 0 ? (
+              <>{status.message ?? 'No jobs available right now.'}</>
+            ) : (
+              <>Scraping complete — {status.counters.found_linkedin ?? 0} LinkedIn +{' '}
+              {status.counters.found_naukri ?? 0} Naukri jobs. Scoring and Sheets logging continue
+              in the background; results appear on the dashboard.</>
+            )}
           </div>
         )}
         {status.state === 'failed' && (

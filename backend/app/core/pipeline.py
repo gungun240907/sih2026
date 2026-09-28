@@ -85,6 +85,23 @@ def run_pipeline(
 
     emit(1, "scrape_done", f"Total scraped: {len(all_jobs)} jobs across 2 portals", {"total": len(all_jobs)})
 
+    # No listings in this city: stop here (no LLM spend, no empty digest).
+    if not all_jobs:
+        note = f"No jobs available right now in {location}"
+        emit(1, "no_jobs", note, {"total": 0, "location": location})
+        summary = {
+            "finished_at": datetime.now().isoformat(),
+            "total_scraped": 0,
+            "score_failures": 0,
+            "total_logged": 0,
+            "notified": 0,
+            "location": location,
+            "note": note,
+            "jobs": [],
+        }
+        emit(4, "pipeline_complete", note, summary)
+        return summary
+
     # Step 2: Score
     emit(2, "score_start", f"Scoring {len(all_jobs)} jobs against your resume", {"total": len(all_jobs)})
     score_failures = 0
@@ -122,6 +139,7 @@ def run_pipeline(
         "score_failures": score_failures,
         "total_logged": len(good_jobs),
         "notified": len(high_score_jobs),
+        "location": location,
         "jobs": [
             {
                 "id": j.id,

@@ -12,7 +12,7 @@ class NaukriScraper(BaseScraper):
 
     def _build_url(self) -> str:
         keyword = "-".join(self.keywords[0].lower().split())
-        location = self.location.lower()
+        location = "-".join(self.location.lower().split())
         return f"https://www.naukri.com/{keyword}-jobs-in-{location}"
 
     def scrape(self, max_jobs: int = 15, headless: bool | None = None, position: str | None = None, on_event=None) -> list[Job]:

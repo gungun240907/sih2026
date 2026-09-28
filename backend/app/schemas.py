@@ -1,6 +1,8 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from app.cities import normalize_city
 
 JobStatus = Literal["new", "applied", "interview", "offer", "rejected"]
 Recommendation = Literal["apply", "maybe", "skip", ""]
@@ -44,6 +46,13 @@ class PipelineRunRequest(BaseModel):
     match_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
     auto_apply_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
     max_jobs_per_portal: int | None = Field(default=None, ge=1, le=50)
+
+    @field_validator("location")
+    @classmethod
+    def _validate_location(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        return normalize_city(v)  # raises ValueError -> 422 on unsupported cities
 
 
 class RunStartOut(BaseModel):

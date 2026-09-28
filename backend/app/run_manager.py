@@ -108,10 +108,13 @@ class RunManager:
             summary = run_pipeline(progress, **params)
             with self._lock:
                 if self._state["run_id"] == run_id:
+                    # surface the pipeline's own closing note (e.g. the
+                    # "no jobs in this city" message) instead of a generic one
+                    closing = summary.get("note") or "Pipeline complete"
                     self._state.update({
                         "state": "completed",
                         "event": "pipeline_complete",
-                        "message": "Pipeline complete",
+                        "message": closing,
                         "finished_at": datetime.now().isoformat(),
                         "summary": summary,
                     })

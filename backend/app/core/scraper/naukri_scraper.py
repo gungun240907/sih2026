@@ -3,6 +3,7 @@ import random
 from datetime import datetime
 from playwright.sync_api import sync_playwright
 
+from app.cities import slugify_city
 from app.config import HEADLESS
 from app.core.scraper.base_scraper import BaseScraper
 from app.core.tracker.models import Job
@@ -12,7 +13,7 @@ class NaukriScraper(BaseScraper):
 
     def _build_url(self) -> str:
         keyword = "-".join(self.keywords[0].lower().split())
-        location = self.location.lower()
+        location = slugify_city(self.location)
         return f"https://www.naukri.com/{keyword}-jobs-in-{location}"
 
     def scrape(self, max_jobs: int = 15, headless: bool | None = None, position: str | None = None, on_event=None) -> list[Job]:

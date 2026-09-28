@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Zap } from 'lucide-react'
 import type { Stats } from './api/client'
 import { api } from './api/client'
+import { DEFAULT_CITY } from './cities'
 import Header from './components/Header'
 import JobTable from './components/JobTable'
 import LiveScraping from './components/LiveScraping'
@@ -21,6 +22,7 @@ export default function App() {
   const { jobs, loading, error, filters, setFilters, updateStatus, clearAll, pipeline, reload } = useJobs()
   const [stats, setStats] = useState<Stats | null>(null)
   const [view, setView] = useState<View>(initialView)
+  const [location, setLocation] = useState(DEFAULT_CITY)
 
   useEffect(() => {
     api.getStats().then(setStats).catch(() => setStats(null))
@@ -44,7 +46,7 @@ export default function App() {
 
   const handleRun = async () => {
     try {
-      await pipeline.run()
+      await pipeline.run({ location })
       // full new page for live scraping (LinkedIn phase, then Naukri phase)
       goLive(true)
       setView('live')
@@ -84,6 +86,8 @@ export default function App() {
         totalSteps={pipeline.status.total_steps}
         connected={pipeline.connected}
         error={pipeline.status.error}
+        location={location}
+        onLocationChange={setLocation}
       />
 
       <main className="fade-up flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 lg:p-8">
@@ -109,6 +113,7 @@ export default function App() {
           filters={filters}
           onFiltersChange={setFilters}
           onStatusUpdate={updateStatus}
+          location={location}
         />
         <footer className="pb-4 text-center text-xs text-muted">
           Job Application Agent · FastAPI + React ·{' '}

@@ -1,4 +1,5 @@
-import { Bot, Brain, ClipboardList, Globe, Play, Trash2 } from 'lucide-react'
+import { Bot, Brain, ClipboardList, Globe, MapPin, Play, Trash2 } from 'lucide-react'
+import { INDIAN_CITIES } from '../cities'
 
 interface Props {
   onRun: () => void
@@ -10,12 +11,15 @@ interface Props {
   totalSteps: number
   connected: boolean
   error?: string | null
+  location: string
+  onLocationChange: (city: string) => void
 }
 
 const STEP_LABELS = ['Scrape portals', 'Score with LLM', 'Log to Sheets', 'Notify']
 
 export default function RunControls({
   onRun, onClear, running, state, message, step, totalSteps, connected, error,
+  location, onLocationChange,
 }: Props) {
   return (
     <aside className="fade-up flex w-full shrink-0 flex-col gap-6 border-b border-border bg-panel p-5 md:w-72 md:border-r md:border-b-0">
@@ -100,8 +104,21 @@ export default function RunControls({
         <div>
           <h2 className="label-caps mb-1">Search Settings</h2>
           <p>Keywords: AI Engineer, ML Engineer</p>
-          <p>Location: Bengaluru</p>
-          <p>Min Score: 65% · Auto-apply: 85%+</p>
+          <label className="mt-2 flex items-center gap-1.5 font-semibold text-text">
+            <MapPin size={13} strokeWidth={1.5} className="text-accent" aria-hidden />
+            Location
+          </label>
+          <select
+            value={location}
+            disabled={running}
+            onChange={(e) => onLocationChange(e.target.value)}
+            className="mt-1 w-full rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-text outline-none hover:border-accent focus:border-accent disabled:opacity-50"
+          >
+            {INDIAN_CITIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          <p className="mt-2">Min Score: 65% · Auto-apply: 85%+</p>
         </div>
         <div>
           <h2 className="label-caps mb-1">Pipeline</h2>
