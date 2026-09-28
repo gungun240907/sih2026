@@ -50,7 +50,7 @@ def get_credentials():
         flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
         creds = flow.run_local_server(port=OAUTH_PORT)
         with open(TOKEN_FILE, "w", encoding="utf-8") as f:
-            creds.to_json(f)
+            f.write(creds.to_json())
         print(f"Token saved to {TOKEN_FILE} — future runs reuse it.")
 
     return creds
@@ -108,7 +108,7 @@ def setup_headers(sheet=None):
         return False
     if sheet.row_values(1):
         print("  Header row did not match — rewriting row 1 in place (no data shifted).")
-    sheet.update(HEADERS, "A1")
+    sheet.update([HEADERS], "A1")
     print("  Headers set in row 1.")
     return True
 
