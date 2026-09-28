@@ -17,6 +17,8 @@ frontend/dist/
 # Local run artifacts
 _run.log
 _run.err
+jobs.json
+backend/jobs.json
 
 # Sheet exports
 job_applications.csv

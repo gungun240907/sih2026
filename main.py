@@ -12,9 +12,12 @@ from notifier.email_notifier import send_daily_digest
 from tracker.sheets_tracker import (
     log_jobs, get_sheet_url, export_csv, export_xlsx,
 )
-from config import KEYWORDS, LOCATION, MATCH_THRESHOLD, AUTO_APPLY_THRESHOLD
+from config import KEYWORDS, LOCATION, MATCH_THRESHOLD, AUTO_APPLY_THRESHOLD, HEADLESS
 
 EXPORT = "--export" in sys.argv
+VISIBLE = "--visible" in sys.argv or "--show" in sys.argv
+# --visible forces headed browsers; each portal gets its own window.
+SCRAPE_HEADLESS = False if VISIBLE else HEADLESS
 
 def load_resume() -> str:
     with open("resume.txt", "r", encoding="utf-8") as f:
@@ -29,19 +32,34 @@ def run_pipeline():
     all_jobs = []
 
     # Step 1: Scrape all portals
-    print(f"\n[1/4] Scraping job portals...")
+    # Visible mode: LinkedIn (left) + Naukri (right) run in parallel so you
+    # see both browsers live, side by side. Headless mode stays sequential.
+    print(f"\n[1/4] Scraping job portals...{' (visible, side-by-side)' if not SCRAPE_HEADLESS else ''}")
 
-    print("  → LinkedIn")
-    linkedin = LinkedInScraper(keywords=KEYWORDS, location=LOCATION)
-    linkedin_jobs = linkedin.scrape(max_jobs=10)
-    print(f"     Found {len(linkedin_jobs)} jobs")
+    if not SCRAPE_HEADLESS:
+        from concurrent.futures import ThreadPoolExecutor
+        print("  → LinkedIn (left window) + Naukri (right window) in parallel")
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            fut_link = pool.submit(
+                LinkedInScraper(keywords=KEYWORDS, location=LOCATION).scrape,
+                10, False, "left",
+            )
+            fut_nauk = pool.submit(
+                NaukriScraper(keywords=KEYWORDS, location=LOCATION).scrape,
+                10, False, "right",
+            )
+            linkedin_jobs = fut_link.result()
+            naukri_jobs = fut_nauk.result()
+    else:
+        print("  → LinkedIn")
+        linkedin = LinkedInScraper(keywords=KEYWORDS, location=LOCATION)
+        linkedin_jobs = linkedin.scrape(max_jobs=10)
+        print("  → Naukri")
+        naukri = NaukriScraper(keywords=KEYWORDS, location=LOCATION)
+        naukri_jobs = naukri.scrape(max_jobs=10)
+    print(f"     Found {len(linkedin_jobs)} LinkedIn jobs")
+    print(f"     Found {len(naukri_jobs)} Naukri jobs")
     all_jobs.extend(linkedin_jobs)
-
-    print("  → Naukri")
-    naukri = NaukriScraper(keywords=KEYWORDS, location=LOCATION)
-    naukri_jobs = naukri.scrape(max_jobs=10)
-    print(f"     Found {len(naukri_jobs)} jobs")
-    all_jobs.extend(naukri_jobs)
 
     print(f"\n  Total scraped: {len(all_jobs)} jobs across 2 portals")
 

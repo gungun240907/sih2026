@@ -3,9 +3,9 @@ import random
 from datetime import datetime
 from playwright.sync_api import sync_playwright
 
-from scraper.base_scraper import BaseScraper
-from config import HEADLESS
-from tracker.models import Job
+from app.config import HEADLESS
+from app.core.scraper.base_scraper import BaseScraper
+from app.core.tracker.models import Job
 
 
 class NaukriScraper(BaseScraper):
@@ -26,7 +26,7 @@ class NaukriScraper(BaseScraper):
             args = ["--window-position=960,0", "--window-size=960,1040"]
 
         def emit(msg, job=None):
-            print(msg)
+            print(msg, flush=True)
             if on_event:
                 try:
                     on_event("naukri", msg, job)
@@ -34,7 +34,7 @@ class NaukriScraper(BaseScraper):
                     pass
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=show, args=args, slow_mo=250 if not show else 0)
+            browser = p.chromium.launch(headless=show, channel="chrome", args=args, slow_mo=250 if not show else 0)
             page = browser.new_page()
 
             # Set user agent to avoid detection
@@ -45,13 +45,27 @@ class NaukriScraper(BaseScraper):
             })
 
             emit(f"Naukri: opening {url}")
-            page.goto(url, timeout=60000)
+            response = page.goto(url, timeout=60000)
             page.wait_for_timeout(3000)
+
+            # Naukri sits behind Akamai, which answers 403 "Access Denied" to
+            # headless sessions before any HTML is served. Detect that explicitly,
+            # otherwise a blocked run is indistinguishable from "no jobs today".
+            status = response.status if response else None
+            title = (page.title() or "").lower()
+            if status == 403 or "access denied" in title or "forbidden" in title:
+                print(
+                    "Naukri: BLOCKED (HTTP %s, title=%r). Their CDN rejects this "
+                    "client before HTML loads - returning 0 jobs. LinkedIn results "
+                    "are unaffected." % (status, page.title())
+                )
+                browser.close()
+                return []
 
             # Dismiss any popups
             try:
                 close = page.query_selector("button.close-btn")
-                if close:
+                if close and close.is_visible():
                     close.click()
                     page.wait_for_timeout(500)
             except Exception:
@@ -59,6 +73,12 @@ class NaukriScraper(BaseScraper):
 
             cards = page.query_selector_all(".srp-jobtuple-wrapper")
             emit(f"Naukri: found {len(cards)} job cards")
+            if not cards:
+                print(
+                    "Naukri: 0 cards despite a %s response - the CSS selectors "
+                    "(.srp-jobtuple-wrapper) are likely stale and need updating."
+                    % status
+                )
 
             for card in cards[:max_jobs]:
                 try:

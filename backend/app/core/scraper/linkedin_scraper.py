@@ -2,9 +2,9 @@ import time
 import random
 from datetime import datetime
 from playwright.sync_api import sync_playwright
-from scraper.base_scraper import BaseScraper
-from config import HEADLESS
-from tracker.models import Job
+from app.config import HEADLESS
+from app.core.scraper.base_scraper import BaseScraper
+from app.core.tracker.models import Job
 
 class LinkedInScraper(BaseScraper):
     BASE_URL = "https://www.linkedin.com/jobs/search/"
@@ -21,7 +21,7 @@ class LinkedInScraper(BaseScraper):
             args = ["--window-position=960,0", "--window-size=960,1040"]
 
         def emit(msg, job=None):
-            print(msg)
+            print(msg, flush=True)
             if on_event:
                 try:
                     on_event("linkedin", msg, job)
@@ -29,7 +29,7 @@ class LinkedInScraper(BaseScraper):
                     pass
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=show, args=args, slow_mo=250 if not show else 0)
+            browser = p.chromium.launch(headless=show, channel="chrome", args=args, slow_mo=250 if not show else 0)
             page = browser.new_page()
             emit(f"LinkedIn: opening {url}")
             page.goto(url, timeout=60000)
@@ -72,6 +72,11 @@ class LinkedInScraper(BaseScraper):
                 job.description = self.get_description(page, job.url)
                 emit(f"LinkedIn: description ({len(job.description)} chars) for {job.title}", job)
                 time.sleep(random.uniform(1, 2))
+            
+            if not show:
+                print("Holding browser open for 5 seconds before closing...")
+                page.wait_for_timeout(5000)
+
             browser.close()
             emit(f"LinkedIn: done, {len(jobs)} jobs")
 
@@ -83,8 +88,10 @@ class LinkedInScraper(BaseScraper):
             page.wait_for_timeout(2000)
             try:
                 close_btn = page.query_selector("button[aria-label='Dismiss']")
-                if close_btn:
-                    close_btn.click(timeout=3000)
+                # the sign-in modal always injects this button even when hidden;
+                # clicking it anyway burns the full timeout on every single job
+                if close_btn and close_btn.is_visible():
+                    close_btn.click(timeout=1500)
                     page.wait_for_timeout(800)
             except Exception:
                 pass
