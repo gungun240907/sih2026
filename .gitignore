@@ -6,6 +6,9 @@ __pycache__/
 # Secrets
 .env
 credentials.json
+oauth_client.json
+client_secret*.json
+token.json
 
 # Node
 node_modules/

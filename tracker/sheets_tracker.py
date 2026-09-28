@@ -1,12 +1,19 @@
+import os
 import gspread
-from google.oauth2.service_account import Credentials
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
 from config import GOOGLE_SHEET_NAME
 from tracker.models import Job
 
 SCOPES = [
-    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
+
+CLIENT_SECRETS_FILE = "oauth_client.json"
+TOKEN_FILE = "token.json"
+OAUTH_PORT = 8765
 
 HEADERS = [
     "ID", "Title", "Company", "Location", "URL",
@@ -14,10 +21,41 @@ HEADERS = [
     "Matched Skills", "Missing Skills", "Status", "Scraped At"
 ]
 
+def get_credentials():
+    creds = None
+
+    if os.path.exists(TOKEN_FILE):
+        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+
+    if creds and creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+
+    if not creds or not creds.valid:
+        if not os.path.exists(CLIENT_SECRETS_FILE):
+            raise FileNotFoundError(
+                f"Missing {CLIENT_SECRETS_FILE}. In Google Cloud Console go to "
+                "APIs & Services > Credentials > Create credentials > "
+                "OAuth client ID, choose Desktop app, and download the JSON here."
+            )
+        print("No valid token found — opening browser for Google sign-in...")
+        flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
+        creds = flow.run_local_server(port=OAUTH_PORT)
+        with open(TOKEN_FILE, "w", encoding="utf-8") as f:
+            creds.to_json(f)
+        print(f"Token saved to {TOKEN_FILE} — future runs reuse it.")
+
+    return creds
+
 def get_sheet():
-    creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
-    gc = gspread.authorize(creds)
-    return gc.open(GOOGLE_SHEET_NAME).sheet1
+    gc = gspread.authorize(get_credentials())
+    try:
+        return gc.open(GOOGLE_SHEET_NAME).sheet1
+    except gspread.SpreadsheetNotFound:
+        raise gspread.SpreadsheetNotFound(
+            f"No spreadsheet named '{GOOGLE_SHEET_NAME}' is visible to this Google "
+            "account. Create a sheet with that exact name in your Drive, or set "
+            "GOOGLE_SHEET_NAME in .env to an existing one."
+        )
 
 
 def setup_headers():

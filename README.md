@@ -21,6 +21,7 @@ LinkedIn + Naukri            Groq LLM               Google Sheets
 4. **Tracker** — passes surviving jobs to Google Sheets in one batch write, with
    deduplication on job ID
 5. **Notifier** — emails a digest of the priority jobs via Resend
+6. **Auth** — Google OAuth runs on first use only; the token is cached in `token.json`
 
 ## Project Structure
 
@@ -81,11 +82,23 @@ scraper work in a visible Chromium window.
 
 ### 3. Google Sheets
 
-- Create a Google Cloud project and enable the **Sheets API** and **Drive API**
-- Create a **Service Account**, download its JSON key, and rename it
-  `credentials.json`, then place it in the repo root (gitignored)
-- Create a Google Sheet whose name matches `GOOGLE_SHEET_NAME`
-- Share the sheet with the service account's email as **Editor**
+`sheets_tracker.py` authenticates **as your own Google account** via OAuth, so the
+target sheet lives in your own Drive.
+
+1. In [Google Cloud Console](https://console.cloud.google.com) for your project, open
+   **APIs & Services → Credentials**
+2. **Create credentials → OAuth client ID → Desktop app**
+3. Download the JSON and save it in the repo root as `oauth_client.json`
+4. Create a Google Sheet whose name matches `GOOGLE_SHEET_NAME`
+   (default `Job Applications`)
+
+On the first run a browser opens for Google sign-in. The resulting token is cached in
+`token.json`, so this happens only once. Both files are gitignored.
+
+If your app is still in the Google **Testing** publishing state, add
+`devfeedmail@gmail.com` under **OAuth consent screen → Test users** — otherwise Google
+returns `access_denied`. On the consent warning page choose
+**Advanced → Go to (unsafe)**.
 
 ### 4. Resume
 
