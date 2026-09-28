@@ -1,3 +1,9 @@
+import sys
+
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, 'reconfigure'):
+        _s.reconfigure(encoding='utf-8', errors='replace')
+
 from scraper.linkedin_scraper import LinkedInScraper
 
 scraper = LinkedInScraper(keywords=["AI Engineer"], location="Bengaluru")

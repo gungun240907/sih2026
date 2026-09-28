@@ -91,8 +91,7 @@ def _build_email_body(jobs: list[Job]) -> str:
                     border-radius:8px;text-align:center;">
             <p style="color:#666;font-size:0.85rem;margin:0;">
                 Sent by your Job Application Agent ·
-                Update application status in your
-                <a href="http://localhost:8501" style="color:#7c83ff;">dashboard</a>
+                Update application status in your Google Sheet
             </p>
         </div>
     </body>

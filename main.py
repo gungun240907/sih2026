@@ -9,8 +9,12 @@ from scraper.linkedin_scraper import LinkedInScraper
 from scraper.naukri_scraper import NaukriScraper
 from matcher.resume_matcher import score_job, filter_jobs
 from notifier.email_notifier import send_daily_digest
-from tracker.sheets_tracker import log_jobs
+from tracker.sheets_tracker import (
+    log_jobs, get_sheet_url, export_csv, export_xlsx,
+)
 from config import KEYWORDS, LOCATION, MATCH_THRESHOLD, AUTO_APPLY_THRESHOLD
+
+EXPORT = "--export" in sys.argv
 
 def load_resume() -> str:
     with open("resume.txt", "r", encoding="utf-8") as f:
@@ -25,7 +29,7 @@ def run_pipeline():
     all_jobs = []
 
     # Step 1: Scrape all portals
-    print(f"\n[1/3] Scraping job portals...")
+    print(f"\n[1/4] Scraping job portals...")
 
     print("  → LinkedIn")
     linkedin = LinkedInScraper(keywords=KEYWORDS, location=LOCATION)
@@ -42,14 +46,14 @@ def run_pipeline():
     print(f"\n  Total scraped: {len(all_jobs)} jobs across 2 portals")
 
     # Step 2: Score
-    print(f"\n[2/3] Scoring {len(all_jobs)} jobs against your resume...")
+    print(f"\n[2/4] Scoring {len(all_jobs)} jobs against your resume...")
     for i, job in enumerate(all_jobs):
         print(f"      {i+1}/{len(all_jobs)}: {job.title} at {job.company} [{job.source}]")
         all_jobs[i] = score_job(job, resume_text)
         time.sleep(0.5)
 
     # Step 3: Filter + Log
-    print(f"\n[3/3] Filtering and logging to Google Sheets...")
+    print(f"\n[3/4] Filtering and logging to Google Sheets...")
     good_jobs = filter_jobs(all_jobs, threshold=MATCH_THRESHOLD)
     print(f"      {len(good_jobs)} jobs passed threshold out of {len(all_jobs)}")
     log_jobs(good_jobs)
@@ -58,6 +62,12 @@ def run_pipeline():
     print("\n[4/4] Sending email digest...")
     high_score_jobs = [j for j in good_jobs if j.match_score >= AUTO_APPLY_THRESHOLD]
     send_daily_digest(high_score_jobs)
+
+    # Sheet access / download
+    print(f"\n  Spreadsheet: {get_sheet_url()}")
+    if EXPORT:
+        print(f"  Downloaded  : {export_csv()}")
+        print(f"  Downloaded  : {export_xlsx()}")
 
     # Summary
     print("\n" + "=" * 50)

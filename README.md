@@ -110,6 +110,26 @@ Put your resume in `resume.txt` as plain text.
 python main.py
 ```
 
+The run ends by printing a direct link to your Google Sheet. To also save a local
+copy you can open or share offline:
+
+```bash
+python main.py --export
+```
+
+This writes `job_applications.csv` and `job_applications.xlsx` next to `main.py`.
+Both are gitignored.
+
+You can pull the sheet down at any time without re-scraping:
+
+```python
+from tracker.sheets_tracker import get_sheet_url, export_csv, export_xlsx
+
+get_sheet_url()      # direct browser link
+export_csv()         # -> job_applications.csv
+export_xlsx()        # -> job_applications.xlsx
+```
+
 ## Agent Decision Logic
 
 ```

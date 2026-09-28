@@ -1,3 +1,9 @@
+import sys
+
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, 'reconfigure'):
+        _s.reconfigure(encoding='utf-8', errors='replace')
+
 from notifier.email_notifier import send_daily_digest
 from tracker.models import Job
 from datetime import datetime

@@ -13,3 +13,11 @@ token.json
 # Node
 node_modules/
 frontend/dist/
+
+# Local run artifacts
+_run.log
+_run.err
+
+# Sheet exports
+job_applications.csv
+job_applications.xlsx
