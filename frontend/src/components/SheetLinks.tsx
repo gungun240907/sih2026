@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ArrowDownToLine, Table2 } from 'lucide-react'
 
 export default function SheetLinks() {
   const [url, setUrl] = useState<string | null>(null)
@@ -15,12 +16,12 @@ export default function SheetLinks() {
   }, [])
 
   const btn =
-    'rounded-lg border border-border bg-card2 px-3 py-1.5 text-xs font-semibold text-text hover:border-accent hover:text-accent'
+    'inline-flex items-center gap-1.5 rounded-full border border-border bg-card2 px-3 py-1.5 text-xs font-semibold text-text hover:border-accent hover:text-accent'
 
   if (error || url === null) {
     return (
       <span className="text-xs text-muted" title="Sheet not reachable">
-        {error ? '📄 Sheet unavailable' : '📄 Locating sheet…'}
+        {error ? 'Sheet unavailable' : 'Locating sheet…'}
       </span>
     )
   }
@@ -28,13 +29,16 @@ export default function SheetLinks() {
   return (
     <div className="flex flex-wrap gap-2">
       <a href={url} target="_blank" rel="noreferrer" className={btn}>
-        📄 View Google Sheet
+        <Table2 size={13} strokeWidth={1.5} aria-hidden />
+        View Google Sheet
       </a>
       <a href="/api/sheet/export?fmt=csv" className={btn}>
-        ⬇ CSV
+        <ArrowDownToLine size={13} strokeWidth={1.5} aria-hidden />
+        CSV
       </a>
       <a href="/api/sheet/export?fmt=xlsx" className={btn}>
-        ⬇ Excel
+        <ArrowDownToLine size={13} strokeWidth={1.5} aria-hidden />
+        Excel
       </a>
     </div>
   )

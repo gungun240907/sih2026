@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Zap } from 'lucide-react'
 import type { Stats } from './api/client'
 import { api } from './api/client'
 import Header from './components/Header'
@@ -72,7 +73,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col md:flex-row">
       <RunControls
         onRun={handleRun}
         onClear={handleClear}
@@ -85,14 +86,15 @@ export default function App() {
         error={pipeline.status.error}
       />
 
-      <main className="flex-1 space-y-6 overflow-y-auto p-8">
+      <main className="fade-up flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <Header />
         {running && (
           <button
             onClick={() => goLive(true)}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover"
+            className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-[#FBF9F4] hover:bg-accent-hover"
           >
-            ⚡ Watch live scraping in a new tab
+            <Zap size={15} strokeWidth={1.5} aria-hidden />
+            Watch live scraping in a new tab
           </button>
         )}
         <MetricsRow stats={stats} />
@@ -110,7 +112,7 @@ export default function App() {
         />
         <footer className="pb-4 text-center text-xs text-muted">
           Job Application Agent · FastAPI + React ·{' '}
-          <button onClick={reload} className="text-accent hover:underline">Refresh data</button>
+          <button onClick={reload} className="font-semibold text-accent hover:text-accent-hover hover:underline">Refresh data</button>
         </footer>
       </main>
     </div>

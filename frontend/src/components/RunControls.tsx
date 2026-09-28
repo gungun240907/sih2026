@@ -1,3 +1,5 @@
+import { Bot, Brain, ClipboardList, Globe, Play, Trash2 } from 'lucide-react'
+
 interface Props {
   onRun: () => void
   onClear: () => void
@@ -16,39 +18,44 @@ export default function RunControls({
   onRun, onClear, running, state, message, step, totalSteps, connected, error,
 }: Props) {
   return (
-    <aside className="w-72 shrink-0 border-r border-border bg-panel p-5 flex flex-col gap-6">
+    <aside className="fade-up flex w-full shrink-0 flex-col gap-6 border-b border-border bg-panel p-5 md:w-72 md:border-r md:border-b-0">
       <div>
-        <h1 className="text-lg font-bold text-text">🤖 Job Agent</h1>
+        <h1 className="flex items-center gap-2 text-lg font-semibold text-text">
+          <Bot size={20} strokeWidth={1.5} className="text-accent" aria-hidden />
+          Job Agent
+        </h1>
         <div className="mt-1 flex items-center gap-2 text-xs text-muted">
           <span
-            className={`inline-block h-2 w-2 rounded-full ${connected ? 'bg-green' : 'bg-red'}`}
+            className={`inline-block h-2 w-2 rounded-full ${connected ? 'bg-green' : 'bg-amber'}`}
           />
           {connected ? 'Live connected' : 'Reconnecting…'}
         </div>
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">Controls</h2>
+        <h2 className="label-caps">Controls</h2>
         <button
           onClick={onRun}
           disabled={running}
-          className="w-full rounded-lg bg-accent px-4 py-2.5 font-semibold text-white transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-2.5 font-semibold text-[#FBF9F4] hover:bg-accent-hover active:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {running ? '⏳ Running…' : '▶ Run Agent Now'}
+          <Play size={15} strokeWidth={1.5} aria-hidden />
+          {running ? 'Running…' : 'Run Agent Now'}
         </button>
         <button
           onClick={onClear}
           disabled={running}
-          className="w-full rounded-lg border border-red bg-transparent px-4 py-2.5 font-semibold text-red transition hover:bg-red hover:text-white disabled:opacity-50"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-terra/60 bg-transparent px-4 py-2.5 font-semibold text-terra-deep hover:bg-terra hover:text-[#FBF9F4] active:bg-terra-deep active:text-[#FBF9F4] disabled:opacity-50"
         >
-          🗑️ Clear All Data
+          <Trash2 size={15} strokeWidth={1.5} aria-hidden />
+          Clear All Data
         </button>
       </div>
 
       {state === 'running' && (
-        <div className="rounded-xl border border-border bg-card p-4">
+        <div className="rounded-[10px] border border-border bg-card p-4 shadow-[0_1px_2px_rgba(31,42,36,0.05),0_4px_14px_rgba(31,42,36,0.05)]">
           <div className="mb-2 flex items-center justify-between text-xs text-muted">
-            <span>Progress</span>
+            <span className="label-caps">Progress</span>
             <span>{step}/{totalSteps}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-card2">
@@ -78,28 +85,29 @@ export default function RunControls({
       )}
 
       {state === 'completed' && (
-        <div className="rounded-xl border border-green bg-card p-4 text-xs text-green">
-          ✅ Pipeline complete. {message}
+        <div className="rounded-[10px] border border-green/30 bg-green/10 p-4 text-xs font-medium text-green">
+          Pipeline complete. {message}
         </div>
       )}
       {state === 'failed' && (
-        <div className="rounded-xl border border-red bg-card p-4 text-xs text-red break-words">
-          ❌ {error ?? message ?? 'Pipeline failed'}
+        <div className="rounded-[10px] border border-brick-border bg-brick-bg p-4 text-xs break-words">
+          <p className="font-semibold text-brick-text">Run failed</p>
+          <p className="mt-1 font-mono text-brick-text">{error ?? message ?? 'Pipeline failed'}</p>
         </div>
       )}
 
       <div className="mt-auto flex flex-col gap-4 text-xs text-muted">
         <div>
-          <h2 className="mb-1 font-semibold uppercase tracking-wider">Search Settings</h2>
+          <h2 className="label-caps mb-1">Search Settings</h2>
           <p>Keywords: AI Engineer, ML Engineer</p>
           <p>Location: Bengaluru</p>
           <p>Min Score: 65% · Auto-apply: 85%+</p>
         </div>
         <div>
-          <h2 className="mb-1 font-semibold uppercase tracking-wider">Pipeline</h2>
-          <p>1. 🌐 Scrape LinkedIn</p>
-          <p>2. 🧠 Score with LLM</p>
-          <p>3. 📋 Log to Sheets</p>
+          <h2 className="label-caps mb-1">Pipeline</h2>
+          <p className="flex items-center gap-1.5"><Globe size={13} strokeWidth={1.5} aria-hidden /> 1. Scrape LinkedIn</p>
+          <p className="flex items-center gap-1.5"><Brain size={13} strokeWidth={1.5} aria-hidden /> 2. Score with LLM</p>
+          <p className="flex items-center gap-1.5"><ClipboardList size={13} strokeWidth={1.5} aria-hidden /> 3. Log to Sheets</p>
         </div>
       </div>
     </aside>

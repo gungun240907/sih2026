@@ -1,18 +1,19 @@
 import { useMemo, useState } from 'react'
+import { ArrowDown, ArrowUp, Briefcase, CheckCheck, TriangleAlert } from 'lucide-react'
 import type { Job, JobFilters, JobStatus, Recommendation } from '../api/client'
 
 const STATUS_OPTIONS: { value: JobStatus; label: string }[] = [
-  { value: 'new', label: '🆕 New' },
-  { value: 'applied', label: '📨 Applied' },
-  { value: 'interview', label: '🎤 Interview' },
-  { value: 'offer', label: '🎉 Offer' },
-  { value: 'rejected', label: '❌ Rejected' },
+  { value: 'new', label: 'New' },
+  { value: 'applied', label: 'Applied' },
+  { value: 'interview', label: 'Interview' },
+  { value: 'offer', label: 'Offer' },
+  { value: 'rejected', label: 'Rejected' },
 ]
 
 const REC_STYLE: Record<string, string> = {
-  apply: 'bg-green/15 text-green border-green/40',
-  maybe: 'bg-amber/15 text-amber border-amber/40',
-  skip: 'bg-red/15 text-red border-red/40',
+  apply: 'bg-green/10 text-green border-green/30',
+  maybe: 'bg-amber/10 text-amber border-amber/30',
+  skip: 'bg-red/10 text-red border-red/30',
 }
 
 interface Props {
@@ -59,32 +60,43 @@ export default function JobTable({ jobs, loading, error, filters, onFiltersChang
   }
 
   if (loading) {
-    return <div className="rounded-2xl border border-border bg-card p-10 text-center text-muted">Loading jobs…</div>
+    return <div className="rounded-[10px] border border-border bg-card p-10 text-center text-muted">Loading jobs…</div>
   }
   if (error) {
-    return <div className="rounded-2xl border border-red bg-card p-6 text-red">Could not load data: {error}</div>
+    return (
+      <div className="rounded-[10px] border border-brick-border bg-brick-bg p-6 text-brick-text">
+        <p className="flex items-center gap-2 text-sm font-semibold">
+          <TriangleAlert size={16} strokeWidth={1.5} aria-hidden />
+          Could not load data
+        </p>
+        <p className="mt-1 font-mono text-xs">{error}</p>
+      </div>
+    )
   }
   if (jobs.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-10 text-center text-muted">
-        No jobs logged yet. Click <strong className="text-accent">▶ Run Agent Now</strong> in the sidebar.
+      <div className="rounded-[10px] border border-border bg-card p-10 text-center text-muted">
+        No jobs logged yet. Click <strong className="text-accent">Run Agent Now</strong> in the sidebar.
       </div>
     )
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-6">
-      <h2 className="mb-4 border-b border-border pb-2 text-lg font-bold">💼 Job Pipeline</h2>
+    <section className="rounded-[10px] border border-border bg-card p-4 shadow-[0_1px_2px_rgba(31,42,36,0.05),0_4px_14px_rgba(31,42,36,0.05)] sm:p-6">
+      <h2 className="mb-4 flex items-center gap-2 border-b border-border pb-2 text-lg font-semibold text-text">
+        <Briefcase size={18} strokeWidth={1.5} className="text-accent" aria-hidden />
+        Job Pipeline
+      </h2>
 
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
         <div>
-          <p className="mb-1.5 text-xs font-medium text-muted">Recommendation</p>
+          <p className="label-caps mb-1.5">Recommendation</p>
           <div className="flex flex-wrap gap-1.5">
             {REC_VALUES.map((r) => (
               <button
                 key={r}
                 onClick={() => onFiltersChange({ ...filters, recommendation: toggle(filters.recommendation, r) })}
-                className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize transition ${
+                className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize hover:border-accent hover:text-accent ${
                   filters.recommendation.includes(r) ? REC_STYLE[r] : 'border-border text-muted'
                 }`}
               >
@@ -94,15 +106,15 @@ export default function JobTable({ jobs, loading, error, filters, onFiltersChang
           </div>
         </div>
         <div>
-          <p className="mb-1.5 text-xs font-medium text-muted">Status</p>
+          <p className="label-caps mb-1.5">Status</p>
           <div className="flex flex-wrap gap-1.5">
             {availableStatuses.map((s) => (
               <button
                 key={s}
                 onClick={() => onFiltersChange({ ...filters, status: toggle(filters.status, s) })}
-                className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize transition ${
+                className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize hover:border-accent hover:text-accent ${
                   filters.status.includes(s)
-                    ? 'border-accent/40 bg-accent/15 text-accent'
+                    ? 'border-accent/40 bg-accent/10 text-accent'
                     : 'border-border text-muted'
                 }`}
               >
@@ -112,7 +124,7 @@ export default function JobTable({ jobs, loading, error, filters, onFiltersChang
           </div>
         </div>
         <div>
-          <p className="mb-1.5 text-xs font-medium text-muted">Min score: {filters.min_score}%</p>
+          <p className="label-caps mb-1.5">Min score: {filters.min_score}%</p>
           <input
             type="range"
             min={0}
@@ -120,12 +132,12 @@ export default function JobTable({ jobs, loading, error, filters, onFiltersChang
             step={5}
             value={filters.min_score}
             onChange={(e) => onFiltersChange({ ...filters, min_score: Number(e.target.value) })}
-            className="w-full accent-[#7c83ff]"
+            className="w-full"
           />
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border">
+      <div className="overflow-x-auto rounded-lg border border-border">
         <table className="w-full text-left text-sm">
           <thead className="bg-card2 text-xs uppercase text-muted">
             <tr>
@@ -136,11 +148,13 @@ export default function JobTable({ jobs, loading, error, filters, onFiltersChang
                 className="cursor-pointer px-4 py-3 select-none hover:text-text"
                 onClick={() => setSortDesc((v) => !v)}
               >
-                Score {sortDesc ? '↓' : '↑'}
+                <span className="inline-flex items-center gap-1">
+                  Score {sortDesc ? <ArrowDown size={12} strokeWidth={1.5} aria-hidden /> : <ArrowUp size={12} strokeWidth={1.5} aria-hidden />}
+                </span>
               </th>
               <th className="px-4 py-3">Rec</th>
-              <th className="px-4 py-3">✅ Matched</th>
-              <th className="px-4 py-3">❌ Missing</th>
+              <th className="px-4 py-3">Matched</th>
+              <th className="px-4 py-3">Missing</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">URL</th>
             </tr>
@@ -151,14 +165,17 @@ export default function JobTable({ jobs, loading, error, filters, onFiltersChang
                 <td className="max-w-56 truncate px-4 py-3 font-medium" title={job.title}>{job.title}</td>
                 <td className="px-4 py-3">{job.company}</td>
                 <td className="px-4 py-3 text-muted">{job.location}</td>
-                <td className="px-4 py-3 font-bold text-accent">{Math.round(job.match_score * 100)}%</td>
+                <td className="px-4 py-3 font-serif font-semibold text-accent">{Math.round(job.match_score * 100)}%</td>
                 <td className="px-4 py-3">
                   <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold capitalize ${REC_STYLE[job.recommendation] ?? 'border-border text-muted'}`}>
                     {job.recommendation || '—'}
                   </span>
                 </td>
                 <td className="max-w-40 truncate px-4 py-3 text-xs text-green" title={job.matched_skills.join(', ')}>
-                  {job.matched_skills.join(', ') || '—'}
+                  <span className="inline-flex items-center gap-1">
+                    <CheckCheck size={12} strokeWidth={1.5} aria-hidden />
+                    {job.matched_skills.join(', ') || '—'}
+                  </span>
                 </td>
                 <td className="max-w-40 truncate px-4 py-3 text-xs text-red" title={job.missing_skills.join(', ')}>
                   {job.missing_skills.join(', ') || '—'}
@@ -168,7 +185,7 @@ export default function JobTable({ jobs, loading, error, filters, onFiltersChang
                     value={job.status}
                     disabled={updatingId === job.id}
                     onChange={(e) => handleStatusChange(job.id, e.target.value as JobStatus)}
-                    className="rounded-lg border border-border bg-card px-2 py-1 text-xs text-text outline-none focus:border-accent disabled:opacity-50"
+                    className="rounded-lg border border-border bg-card px-2 py-1 text-xs text-text outline-none hover:border-accent focus:border-accent disabled:opacity-50"
                   >
                     {STATUS_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>{o.label}</option>
@@ -181,7 +198,7 @@ export default function JobTable({ jobs, loading, error, filters, onFiltersChang
                       href={job.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-md bg-accent px-3 py-1 text-xs font-semibold text-white hover:bg-accent-hover"
+                      className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-[#FBF9F4] hover:bg-accent-hover"
                     >
                       View
                     </a>

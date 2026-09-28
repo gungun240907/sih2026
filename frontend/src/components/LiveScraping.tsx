@@ -1,4 +1,5 @@
 import type { RunStatus } from '../api/client'
+import { ArrowLeft, Building2, Radio, Search } from 'lucide-react'
 import SheetLinks from './SheetLinks'
 
 interface Props {
@@ -14,6 +15,7 @@ function PortalPanel({
   done,
   count,
   jobs,
+  icon,
 }: {
   title: string
   subtitle: string
@@ -21,22 +23,26 @@ function PortalPanel({
   done: boolean
   count: number | undefined
   jobs: { title: string; company: string; url: string; message: string }[]
+  icon: React.ReactNode
 }) {
   return (
     <section
-      className={`flex-1 rounded-2xl border bg-card p-5 ${
+      className={`fade-up flex-1 rounded-[10px] border bg-card p-5 shadow-[0_1px_2px_rgba(31,42,36,0.05),0_4px_14px_rgba(31,42,36,0.05)] ${
         active ? 'border-accent' : 'border-border'
       }`}
     >
       <div className="mb-1 flex items-center justify-between">
-        <h2 className="text-base font-bold text-text">{title}</h2>
+        <h2 className="flex items-center gap-2 text-base font-semibold text-text">
+          {icon}
+          {title}
+        </h2>
         <span className="text-xs text-muted">
           {done ? '✓ done' : active ? '● live' : '○ waiting'}
         </span>
       </div>
       <p className="mb-3 text-xs text-muted">{subtitle}</p>
       {count != null && (
-        <p className="mb-3 text-sm font-semibold text-text">
+        <p className="mb-3 font-serif text-lg font-semibold text-text">
           {count} jobs scraped
         </p>
       )}
@@ -46,13 +52,13 @@ function PortalPanel({
         </p>
       ) : (
         <ul className="max-h-96 space-y-2 overflow-y-auto">
-          {[...jobs].reverse().map((j) => (
-            <li key={`${j.url}`} className="rounded-lg bg-card2 p-2.5 text-xs">
+          {[...jobs].reverse().map((j, i) => (
+            <li key={`${j.url}-${i}`} className="rounded-lg bg-card2 p-2.5 text-xs">
               <a
                 href={j.url}
                 target="_blank"
                 rel="noreferrer"
-                className="font-semibold text-accent hover:underline"
+                className="font-semibold text-accent hover:text-accent-hover hover:underline"
               >
                 {j.title}
               </a>
@@ -76,15 +82,18 @@ export default function LiveScraping({ status, connected, onBack }: Props) {
   const nkActive = scraping && liDone
 
   return (
-    <div className="min-h-screen bg-bg p-8">
+    <div className="min-h-screen bg-bg p-4 sm:p-8">
       <div className="mx-auto max-w-6xl space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl font-bold text-text">⚡ Live Scraping</h1>
+            <h1 className="flex items-center gap-2 text-xl font-semibold text-text">
+              <Radio size={20} strokeWidth={1.5} className="text-accent" aria-hidden />
+              Live Scraping
+            </h1>
             <p className="mt-1 flex items-center gap-2 text-xs text-muted">
               <span
                 className={`inline-block h-2 w-2 rounded-full ${
-                  connected ? 'bg-green' : 'bg-red'
+                  connected ? 'bg-green' : 'bg-amber'
                 }`}
               />
               {connected ? 'Live connected' : 'Reconnecting…'}
@@ -93,22 +102,23 @@ export default function LiveScraping({ status, connected, onBack }: Props) {
           </div>
           <button
             onClick={onBack}
-            className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-text hover:bg-card"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-text hover:border-accent hover:text-accent"
           >
-            ← Back to Dashboard
+            <ArrowLeft size={15} strokeWidth={1.5} aria-hidden />
+            Back to Dashboard
           </button>
         </div>
 
         {status.state === 'completed' && (
-          <div className="rounded-xl border border-green bg-card p-4 text-sm text-green">
-            ✅ Scraping complete — {status.counters.found_linkedin ?? 0} LinkedIn +{' '}
+          <div className="rounded-[10px] border border-green/30 bg-green/10 p-4 text-sm font-medium text-green">
+            Scraping complete — {status.counters.found_linkedin ?? 0} LinkedIn +{' '}
             {status.counters.found_naukri ?? 0} Naukri jobs. Scoring and Sheets logging continue
             in the background; results appear on the dashboard.
           </div>
         )}
         {status.state === 'failed' && (
-          <div className="rounded-xl border border-red bg-card p-4 text-sm text-red">
-            ❌ {status.error ?? status.message ?? 'Pipeline failed'}
+          <div className="rounded-[10px] border border-brick-border bg-brick-bg p-4 text-sm">
+            <p className="font-mono text-xs text-brick-text">{status.error ?? status.message ?? 'Pipeline failed'}</p>
           </div>
         )}
 
@@ -120,6 +130,7 @@ export default function LiveScraping({ status, connected, onBack }: Props) {
             done={liDone}
             count={status.counters.found_linkedin}
             jobs={liJobs}
+            icon={<Building2 size={17} strokeWidth={1.5} className="text-accent" aria-hidden />}
           />
           <PortalPanel
             title="Phase 2 — Naukri"
@@ -128,6 +139,7 @@ export default function LiveScraping({ status, connected, onBack }: Props) {
             done={status.counters.found_naukri != null}
             count={status.counters.found_naukri}
             jobs={nkJobs}
+            icon={<Search size={17} strokeWidth={1.5} className="text-accent" aria-hidden />}
           />
         </div>
 
